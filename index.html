@@ -56,10 +56,30 @@
             color: white;
         }
 
-        section {
-            padding: 30px;
-            max-width: 1000px;
+        main {
+            display: flex;
+            justify-content: space-between;
             margin: 20px auto;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        aside {
+            width: 30%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        aside h2 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        section {
+            width: 65%;
+            padding: 30px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -158,16 +178,14 @@
 
         /* Мобильная версия */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
+            main {
+                flex-direction: column;
+                align-items: center;
             }
 
-            nav ul li a {
-                font-size: 0.9rem;
-            }
-
-            section {
-                padding: 20px;
+            aside, section {
+                width: 90%;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -178,53 +196,51 @@
         <nav>
             <ul>
                 <li><a href="#programs">Программы</a></li>
-                <li><a href="#register">Регистрация</a></li>
-                <li><a href="#login">Логин</a></li>
+                <li><a href="#register-login">Регистрация/Вход</a></li>
             </ul>
         </nav>
     </header>
 
-    <section id="programs">
-        <h2>Доступные программы</h2>
-        <ul>
-            <li><a href="program1.exe" download>Программа 1</a></li>
-            <li><a href="program2.exe" download>Программа 2</a></li>
-            <li><a href="program3.exe" download>Программа 3</a></li>
-        </ul>
-    </section>
+    <main>
+        <aside id="register-login">
+            <h2>Регистрация/Вход</h2>
+            <form id="registerForm" onsubmit="register(event)">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" name="username" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+                
+                <button type="submit">Зарегистрироваться</button>
+            </form>
 
-    <section id="register">
-        <h2>Регистрация</h2>
-        <form id="registerForm" onsubmit="register(event)">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-    </section>
+            <form id="loginForm" onsubmit="login(event)">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" name="loginEmail" required>
+                
+                <label for="loginPassword">Пароль:</label>
+                <input type="password" id="loginPassword" name="loginPassword" required>
+                
+                <div class="forgot-password">
+                    <a href="#" onclick="forgotPassword()">Забыли пароль?</a>
+                </div>
+                
+                <button type="submit">Войти</button>
+            </form>
+        </aside>
 
-    <section id="login">
-        <h2>Вход</h2>
-        <form id="loginForm" onsubmit="login(event)">
-            <label for="loginEmail">Email:</label>
-            <input type="email" id="loginEmail" name="loginEmail" required>
-            
-            <label for="loginPassword">Пароль:</label>
-            <input type="password" id="loginPassword" name="loginPassword" required>
-            
-            <div class="forgot-password">
-                <a href="#forgot">Забыли пароль?</a>
-            </div>
-            
-            <button type="submit">Войти</button>
-        </form>
-    </section>
+        <section id="programs">
+            <h2>Доступные программы</h2>
+            <ul>
+                <li><a href="program1.exe" download>Программа 1</a></li>
+                <li><a href="program2.exe" download>Программа 2</a></li>
+                <li><a href="program3.exe" download>Программа 3</a></li>
+            </ul>
+        </section>
+    </main>
 
     <footer>
         © 2024 Программы и Логин. Все права защищены.
@@ -233,13 +249,43 @@
     <script>
         function register(event) {
             event.preventDefault();
-            alert('Вы успешно зарегистрировались!');
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !email || !password) {
+                alert('Пожалуйста, заполните все поля.');
+                return;
+            }
+
+            localStorage.setItem('user', JSON.stringify({ username, email, password }));
+            alert('Регистрация прошла успешно!');
         }
 
         function login(event) {
             event.preventDefault();
-            alert('Вы успешно вошли в систему!');
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+
+            if (storedUser && storedUser.email === email && storedUser.password === password) {
+                alert(`Добро пожаловать, ${storedUser.username}!`);
+            } else {
+                alert('Неверный email или пароль.');
+            }
+        }
+
+        function forgotPassword() {
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+
+            if (storedUser) {
+                alert(`Ваш пароль: ${storedUser.password}`);
+            } else {
+                alert('Нет зарегистрированного пользователя с этим email.');
+            }
         }
     </script>
 </body>
 </html>
+
